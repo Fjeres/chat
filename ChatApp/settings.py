@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['192.168.0.12','90.188.92.68']
 INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'channels',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

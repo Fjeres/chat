@@ -2,6 +2,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import User
+from chat.views import *
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -28,28 +29,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Получение сообщения от сокета
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        print(text_data_json)
+
         message = text_data_json['message']
         username = text_data_json['username']
+        channel = text_data_json['channel']
+        data = {"nickname": username,
+                "channel": channel,
+                "message": message
+                }
+        await update_data_base(data)
         # Send message to room group
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
                 'message': message,
                 'username': username,
+                'channel': channel,
             }
         )
 
-    # Receive message from room group
+        # Receive message from room group
+
     async def chat_message(self, event):
         message = event['message']
         username = event['username']
-        print(event)
+        channel = event['channel']
 
         # Отправить сообщение в WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'username': username,
+            'channel': channel,
 
         }))
