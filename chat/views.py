@@ -4,7 +4,6 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from chat.models import Message  # Our Message model
 from chat.serializers import MessageSerializer
-from django.contrib.auth.models import User
 from asgiref.sync import sync_to_async
 
 
@@ -18,7 +17,7 @@ def room(request, room_name):
 @csrf_exempt
 def message_list(request, nickname=None):
     if request.method == 'GET':
-        messages = Message.objects.filter(nickname_id=User.objects.get(username=nickname).id)
+        messages = Message.objects.filter(nickname=nickname)
         serializer = MessageSerializer(messages, many=True, context={'request': request})
         return JsonResponse(serializer.data, safe=False, status=200)
     elif request.method == 'POST':
@@ -32,7 +31,6 @@ def message_list(request, nickname=None):
 
 @sync_to_async
 def update_data_base(data):
-    print(data)
     serializer = MessageSerializer(data=data)
     if serializer.is_valid():
         serializer.save()

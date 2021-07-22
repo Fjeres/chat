@@ -1,7 +1,6 @@
 # chat/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.contrib.auth.models import User
 from chat.views import *
 
 
@@ -37,9 +36,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "channel": channel,
                 "message": message
                 }
+        # Сохранение полученного сообщения в БД
         await update_data_base(data)
-        # Send message to room group
 
+        # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
